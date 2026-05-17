@@ -1,10 +1,11 @@
+import testRoom from './testRoom.js';
 import bedroom from './bedroom.js';
 import corridor from './corridor.js';
 import kitchen from './kitchen.js';
 import bathroom from './bathroom.js';
 import basement from './basement.js';
 
-const ROOM_LIST = [bedroom, corridor, kitchen, bathroom, basement];
+const ROOM_LIST = [testRoom, bedroom, corridor, kitchen, bathroom, basement];
 
 export function createRoomManager() {
   const map = new Map(ROOM_LIST.map((room) => [room.id, room]));
@@ -21,7 +22,7 @@ export function createRoomManager() {
     getRoom,
     getVisibleRooms,
     getStartRoom() {
-      return bedroom;
+      return testRoom;
     },
     getMap() {
       return ROOM_LIST;

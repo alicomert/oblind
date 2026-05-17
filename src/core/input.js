@@ -1,3 +1,9 @@
+import {
+  ControllerButtonLatch,
+  findGamepad,
+  readGamepadState,
+} from './controller.js';
+
 const KEY_ACTIONS = {
   moveForward: new Set(['w', 'arrowup']),
   moveBackward: new Set(['s', 'arrowdown']),
@@ -11,12 +17,7 @@ const KEY_ACTIONS = {
   lookDown: new Set([]),
 };
 
-const GAMEPAD_AXIS = {
-  leftX: 0,
-  leftY: 1,
-  rightX: 2,
-  rightY: 3,
-};
+const MOUSE_LOOK_TO_TURN_STEP = 1 / 0.06;
 
 const RUMBLE_MAX = {
   short: 180,
@@ -25,13 +26,15 @@ const RUMBLE_MAX = {
 };
 
 export class InputController {
-  constructor() {
+  constructor({ sensitivity = 0.0022, vibrationEnabled = true } = {}) {
     this.pressed = new Set();
     this.gamepadIndex = -1;
+    this.gamepadButtons = new ControllerButtonLatch();
     this.enabled = true;
+    this.vibrationEnabled = vibrationEnabled;
     this.pointer = {
       locked: false,
-      sensitivity: 0.0022,
+      sensitivity,
       yaw: 0,
       pitch: 0,
       move: { x: 0, y: 0 },
@@ -50,9 +53,8 @@ export class InputController {
 
     this.onMouseMove = (event) => {
       if (!this.pointer.locked) return;
-      this.pointer.yaw -= event.movementX * this.pointer.sensitivity;
-      this.pointer.pitch -= event.movementY * this.pointer.sensitivity;
-      this.pointer.pitch = Math.max(-1.2, Math.min(1.2, this.pointer.pitch));
+      this.pointer.yaw += event.movementX * this.pointer.sensitivity * MOUSE_LOOK_TO_TURN_STEP;
+      this.pointer.pitch = 0;
     };
 
     this.onPointerLockChange = () => {
@@ -75,36 +77,38 @@ export class InputController {
     };
   }
 
+  setSensitivity(sensitivity) {
+    this.pointer.sensitivity = sensitivity;
+  }
+
+  setVibrationEnabled(enabled) {
+    this.vibrationEnabled = Boolean(enabled);
+  }
+
   isDefinedKey(key) {
     return Object.values(KEY_ACTIONS).some((set) => set.has(key));
   }
 
   pollGamepad() {
-    if (this.gamepadIndex < 0) return;
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
-    const gamepad = pads[this.gamepadIndex];
-    if (!gamepad) return;
+    const gamepad = findGamepad(pads, this.gamepadIndex);
+    if (!gamepad) {
+      this.gamepadIndex = -1;
+      this.pointer.move.x = 0;
+      this.pointer.move.y = 0;
+      this.pointer.rightStick.x = 0;
+      this.pointer.rightStick.y = 0;
+      this.gamepadButtons.update({});
+      return;
+    }
 
-    const dead = 0.16;
-    const lx = gamepad.axes[GAMEPAD_AXIS.leftX] ?? 0;
-    const ly = gamepad.axes[GAMEPAD_AXIS.leftY] ?? 0;
-    const rx = gamepad.axes[GAMEPAD_AXIS.rightX] ?? 0;
-    const ry = gamepad.axes[GAMEPAD_AXIS.rightY] ?? 0;
-
-    const clean = (v) => (Math.abs(v) < dead ? 0 : v);
-
-    this.pointer.move.x = clean(lx);
-    this.pointer.move.y = clean(ly);
-    this.pointer.rightStick.x = clean(rx);
-    this.pointer.rightStick.y = clean(ry);
-
-    if (Math.abs(gamepad.buttons[0]?.value) > 0.4) this.pressed.add('f');
-    else this.pressed.delete('f');
-    if (Math.abs(gamepad.buttons[1]?.value) > 0.4) this.pressed.add(' ') ;
-    else this.pressed.delete(' ');
-
-    if (gamepad.buttons[9]?.pressed) this.pressed.add('r');
-    else this.pressed.delete('r');
+    const state = readGamepadState(gamepad);
+    this.gamepadIndex = state.index;
+    this.pointer.move.x = state.move.x;
+    this.pointer.move.y = state.move.y;
+    this.pointer.rightStick.x = state.look.x;
+    this.pointer.rightStick.y = state.look.y;
+    this.gamepadButtons.update(state.actions);
   }
 
   isPressed(action) {
@@ -136,14 +140,15 @@ export class InputController {
 
   getLookDelta() {
     const keyboardX = (this.isPressed('turnRight') ? 1 : 0) - (this.isPressed('turnLeft') ? 1 : 0);
-    const keyboardY = (this.isPressed('lookDown') ? 1 : 0) - (this.isPressed('lookUp') ? 1 : 0);
+    const mouseX = this.pointer.yaw;
+    this.pointer.yaw = 0;
+    this.pointer.pitch = 0;
 
     const rightX = this.pointer.rightStick.x * 2.2;
-    const rightY = this.pointer.rightStick.y * 2.2;
 
     return {
-      x: keyboardX + rightX,
-      y: keyboardY + rightY,
+      x: keyboardX + rightX + mouseX,
+      y: 0,
     };
   }
 
@@ -155,13 +160,14 @@ export class InputController {
         return true;
       }
     }
-    return false;
+    return this.gamepadButtons.consume(action);
   }
 
   vibrate(duration = RUMBLE_MAX.short, strongMagnitude = RUMBLE_MAX.strong, weakMagnitude = RUMBLE_MAX.weak) {
+    if (!this.vibrationEnabled) return false;
     if (this.gamepadIndex < 0) return false;
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
-    const gamepad = pads[this.gamepadIndex];
+    const gamepad = findGamepad(pads, this.gamepadIndex);
     const actuator = gamepad?.vibrationActuator;
     if (!actuator?.playEffect) return false;
 

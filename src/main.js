@@ -1,6 +1,14 @@
 import { Game } from './core/game.js';
+import { StartScreen } from './ui/StartScreen.js';
 
 const root = document.body;
-const game = new Game({ root });
+let game = null;
 
-game.start();
+new StartScreen({
+  root,
+  onStart: (settings) => {
+    game = new Game({ root, settings });
+    game.start();
+    window.oblindGame = game;
+  },
+});

@@ -9,7 +9,7 @@ export default {
     minY: 0,
     maxY: 3,
   },
-  playerStart: { x: 0, y: 1.7, z: 2.5 },
+  playerStart: { x: -4, y: 1.7, z: 3.2 },
   layout: [
     { size: [12, 3, 8], position: [0, 1.5, -2], color: 0x0d1118, roughness: 0.94, metalness: 0.02 },
     { size: [1.2, 0.6, 1.4], position: [-2.5, 0.7, -3.6], color: 0x222a37, roughness: 0.72, metalness: 0.1 },

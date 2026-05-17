@@ -134,11 +134,7 @@ export function buildRoomGeometry(scene, rooms) {
   rooms.forEach((room) => {
     for (const block of room.layout) {
       const geo = new THREE.BoxGeometry(block.size[0], block.size[1], block.size[2]);
-      const mat = new THREE.MeshStandardMaterial({
-        color: block.color,
-        roughness: block.roughness,
-        metalness: block.metalness,
-      });
+      const mat = createBlockMaterial(block);
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(block.position[0], block.position[1], block.position[2]);
       mesh.castShadow = true;
@@ -159,9 +155,26 @@ export function buildRoomGeometry(scene, rooms) {
   scene.add(group);
 }
 
+function createBlockMaterial(block) {
+  if (block.material === 'debug-basic') {
+    const material = new THREE.MeshBasicMaterial({
+      color: block.color,
+      side: THREE.DoubleSide,
+    });
+    material.toneMapped = false;
+    return material;
+  }
+
+  return new THREE.MeshStandardMaterial({
+    color: block.color,
+    roughness: block.roughness,
+    metalness: block.metalness,
+  });
+}
+
 export function positionCameraFromMovement(camera, euler, move, look, delta = 1 / 60) {
   const speed = 2.6;
-  euler.x = THREE.MathUtils.clamp(euler.x + look.y * 0.35, -1.1, 1.1);
+  euler.x = 0;
   euler.y -= look.x * 0.06;
   const forward = new THREE.Vector3(0, 0, -1).applyEuler(euler);
   const right = new THREE.Vector3(1, 0, 0).applyEuler(euler);

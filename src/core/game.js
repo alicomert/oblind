@@ -11,13 +11,25 @@ import { CrisisSystem } from '../mechanics/CrisisSystem.js';
 import { EchoLocation } from '../mechanics/EchoLocation.js';
 import { MemoryFragments } from '../mechanics/MemoryFragments.js';
 import { STORY_FLOW } from '../story/StoryManager.js';
+import { getItemAsset } from '../assets/imageLibrary.js';
+import { normalizeGameSettings, toExposure, toPointerSensitivity } from './settings.js';
 
 const HUD_TICK_MS = 90;
 
+export function attachControlRequest(element, input) {
+  const onPointerDown = () => input.requestControl();
+  element.addEventListener('pointerdown', onPointerDown);
+  return () => element.removeEventListener('pointerdown', onPointerDown);
+}
+
 export class Game {
-  constructor({ root }) {
+  constructor({ root, settings } = {}) {
     this.root = root;
-    this.input = new InputController();
+    this.settings = normalizeGameSettings(settings);
+    this.input = new InputController({
+      sensitivity: toPointerSensitivity(this.settings),
+      vibrationEnabled: this.settings.vibration,
+    });
     this.world = createScene();
     this.roomManager = createRoomManager();
     this.story = new StoryManager(STORY_FLOW);
@@ -31,15 +43,20 @@ export class Game {
 
     this.playerYawPitch = new THREE.Euler(0, Math.PI, 0, 'YXZ');
     this.clock = new THREE.Clock();
-    this.currentRoom = this.roomManager.getRoom('bedroom');
+    this.currentRoom = this.roomManager.getStartRoom();
 
     this.world.scene.userData.rooms = this.roomManager.getVisibleRooms(this.currentRoom.id);
     this.world.renderer.domElement.style.display = 'block';
     this.world.renderer.domElement.style.position = 'fixed';
     this.world.renderer.domElement.style.top = 0;
     this.world.renderer.domElement.style.left = 0;
+    this.world.renderer.domElement.style.zIndex = 1;
+    this.world.renderer.domElement.style.cursor = 'crosshair';
+    this.world.overlays.hud.style.zIndex = 3;
+    this.detachControlRequest = attachControlRequest(this.world.renderer.domElement, this.input);
     root.appendChild(this.world.renderer.domElement);
     root.appendChild(this.world.overlays.hud);
+    this.applySettings();
 
     this.interactables = [];
     this.lastHudUpdate = 0;
@@ -65,7 +82,10 @@ export class Game {
   }
 
   prepareRoom(room) {
-    this.interactables = room?.interactives ?? [];
+    this.interactables = (room?.interactives ?? []).map((item) => ({
+      ...item,
+      image: getItemAsset(item.id),
+    }));
     this.currentRoom = room;
     this.currentRoomId = room.id;
     this.world.scene.userData.activeRoomId = room.id;
@@ -131,9 +151,7 @@ export class Game {
       return;
     }
 
-    const currentPrompt = this.story.getPromptText();
-    const focusHint = focus?.name ? ` | ${focus.name}` : '';
-    this.world.overlays.prompt.innerText = `${currentPrompt}${focusHint}`;
+    this.world.overlays.prompt.innerText = '';
     if (delta > 0) this.heart.setStress(this.crisis.getIntensity() * 12);
   }
 
@@ -207,7 +225,16 @@ export class Game {
     this.running = false;
     if (this.raf) cancelAnimationFrame(this.raf);
     window.removeEventListener('resize', this.onResize);
+    this.detachControlRequest?.();
     this.input.destroy();
     this.world.renderer.dispose();
+  }
+
+  applySettings(settings = this.settings) {
+    this.settings = normalizeGameSettings(settings);
+    this.input.setSensitivity(toPointerSensitivity(this.settings));
+    this.input.setVibrationEnabled(this.settings.vibration);
+    this.world.renderer.toneMappingExposure = toExposure(this.settings);
+    this.world.lights.cameraLight.intensity = 0.75 + this.settings.brightness * 0.9;
   }
 }

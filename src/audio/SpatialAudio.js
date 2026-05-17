@@ -2,8 +2,8 @@ import { AudioManager } from './AudioManager.js';
 import * as THREE from 'three';
 
 export class SpatialAudio {
-  constructor() {
-    this.manager = new AudioManager();
+  constructor(settings = {}) {
+    this.manager = new AudioManager(settings);
     this.listener = new THREE.AudioListener();
     this.attachments = new Map();
   }
