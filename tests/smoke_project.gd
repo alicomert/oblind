@@ -6,11 +6,13 @@ const REQUIRED_FILES := [
 	"res://scenes/player/Player.tscn",
 	"res://scenes/rooms/TestRoom.tscn",
 	"res://scenes/ui/HUD.tscn",
+	"res://scenes/ui/StartMenu.tscn",
 	"res://scripts/GameManager.gd",
 	"res://scripts/StoryManager.gd",
 	"res://scripts/PlayerController.gd",
 	"res://scripts/InteractionTarget.gd",
 	"res://scripts/HUD.gd",
+	"res://scripts/StartMenu.gd",
 ]
 
 func _init() -> void:
@@ -25,6 +27,7 @@ func _init() -> void:
 		"res://scenes/player/Player.tscn",
 		"res://scenes/rooms/TestRoom.tscn",
 		"res://scenes/ui/HUD.tscn",
+		"res://scenes/ui/StartMenu.tscn",
 	]:
 		var scene := load(scene_path)
 		if scene == null:

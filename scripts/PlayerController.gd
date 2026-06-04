@@ -5,6 +5,7 @@ extends CharacterBody3D
 @export var gravity := 18.0
 @export var mouse_sensitivity := 0.0022
 @export var gamepad_look_speed := 2.1
+@export var input_enabled := false
 
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var camera: Camera3D = $CameraPivot/Camera3D
@@ -13,9 +14,18 @@ var look_pitch := 0.0
 var focus_targets: Array[Area3D] = []
 
 func _ready() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func set_input_enabled(value: bool) -> void:
+	input_enabled = value
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if input_enabled else Input.MOUSE_MODE_VISIBLE
+	if not input_enabled:
+		velocity = Vector3.ZERO
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not input_enabled:
+		return
+
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		look_pitch = clampf(look_pitch - event.relative.y * mouse_sensitivity, deg_to_rad(-82.0), deg_to_rad(82.0))
@@ -28,6 +38,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		_interact_with_focus()
 
 func _physics_process(delta: float) -> void:
+	if not input_enabled:
+		velocity.x = 0.0
+		velocity.z = 0.0
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+			move_and_slide()
+		return
+
 	_apply_look_from_gamepad(delta)
 	_apply_movement(delta)
 	_update_focus()

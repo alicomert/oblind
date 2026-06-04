@@ -44,6 +44,7 @@ Godot binary adin `godot` ise:
 - `scenes/player/Player.tscn`: FPS karakter
 - `scenes/rooms/TestRoom.tscn`: ilk karanlik test odasi
 - `scenes/ui/HUD.tscn`: hikaye ve etkilesim arayuzu
+- `scenes/ui/StartMenu.tscn`: 529ddea baslangic ekrani, background, menu muzikleri ve UI sesleri
 - `scripts/GameManager.gd`: input, titreşim ve ortak durum
 - `scripts/StoryManager.gd`: hikaye akisi
 - `scripts/PlayerController.gd`: hareket, kamera ve etkilesim
