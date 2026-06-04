@@ -9,6 +9,28 @@ Godot 4.x tabanli karanlik 3D hikaye prototipi.
 3. Ana sahne: `res://scenes/Main.tscn`
 4. Play tusuna bas.
 
+## Canli Web Test
+
+Her `main` push'u GitHub Actions uzerinden Godot Web export alir ve GitHub Pages'e yayinlar.
+
+Canli test adresi:
+
+```text
+https://alicomert.github.io/oblind/
+```
+
+Yerel Linux test icin:
+
+```bash
+GODOT_BIN=godot4 PORT=8080 ./tools/export_web_preview.sh
+```
+
+Godot binary adin `godot` ise:
+
+```bash
+./tools/export_web_preview.sh
+```
+
 ## Kontroller
 
 - `WASD` veya sol analog: hareket
