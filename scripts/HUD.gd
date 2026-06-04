@@ -7,10 +7,14 @@ extends CanvasLayer
 @onready var pulse_bar: ProgressBar = %PulseBar
 
 func _ready() -> void:
-	StoryManager.story_changed.connect(_on_story_changed)
-	GameManager.focus_changed.connect(_on_focus_changed)
-	GameManager.heartbeat_changed.connect(_on_heartbeat_changed)
-	_on_story_changed(StoryManager.get_current_title(), StoryManager.get_current_body())
+	var story_manager := get_node_or_null("/root/StoryManager")
+	var game_manager := get_node_or_null("/root/GameManager")
+	if story_manager:
+		story_manager.story_changed.connect(_on_story_changed)
+		_on_story_changed(story_manager.get_current_title(), story_manager.get_current_body())
+	if game_manager:
+		game_manager.focus_changed.connect(_on_focus_changed)
+		game_manager.heartbeat_changed.connect(_on_heartbeat_changed)
 	_on_focus_changed("")
 
 func _on_story_changed(title: String, body: String) -> void:

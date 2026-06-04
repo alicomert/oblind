@@ -85,10 +85,12 @@ func _update_focus() -> void:
 			best_score = score
 			best_target = target
 
-	if best_target:
-		GameManager.set_focus_name(str(best_target.get("display_name")))
+	var game_manager := get_node_or_null("/root/GameManager")
+	if best_target and game_manager:
+		game_manager.set_focus_name(str(best_target.get("display_name")))
 	else:
-		GameManager.set_focus_name("")
+		if game_manager:
+			game_manager.set_focus_name("")
 
 func _interact_with_focus() -> void:
 	var focus := _get_current_focus()

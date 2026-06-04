@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .godot/
 .import/
+*.import
 *.translation
 
 # Editor directories and files

@@ -16,9 +16,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GODOT_VERSION: "4.3"
+  GODOT_VERSION: "4.5"
   GODOT_STATUS: stable
   EXPORT_PRESET: Web
+  GODOT_SILENCE_ROOT_WARNING: "1"
 
 jobs:
   export-web:
@@ -58,7 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/web
-          "Godot_v${GODOT_VERSION}-${GODOT_STATUS}_linux.x86_64" --headless --path . --export-release "${EXPORT_PRESET}" build/web/index.html
+          "Godot_v${GODOT_VERSION}-${GODOT_STATUS}_linux.x86_64" --headless --verbose --path . --export-release "${EXPORT_PRESET}" build/web/index.html
           touch build/web/.nojekyll
 
       - name: Configure Pages

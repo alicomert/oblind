@@ -11,7 +11,7 @@ Godot 4.x tabanli karanlik 3D hikaye prototipi.
 
 ## Canli Web Test
 
-Her `main` push'u GitHub Actions uzerinden Godot Web export alir ve GitHub Pages'e yayinlar.
+Her `main` push'u GitHub Actions uzerinden Godot Web export alir ve GitHub Pages'e yayinlar. CI export araci Godot `4.5` kullanir.
 
 Canli test adresi:
 

@@ -1,4 +1,6 @@
 extends Node3D
 
 func _ready() -> void:
-	StoryManager.reset()
+	var story_manager := get_node_or_null("/root/StoryManager")
+	if story_manager:
+		story_manager.reset()
