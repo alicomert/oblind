@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+.godot/
+.import/
+export_presets.cfg
+*.translation
 
 # Editor directories and files
 .vscode/*

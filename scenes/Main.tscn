@@ -1,0 +1,33 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/TestRoom.tscn" id="2_room"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4_hud"]
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 1
+background_color = Color(0.005, 0.006, 0.008, 1)
+ambient_light_source = 1
+ambient_light_color = Color(0.02, 0.024, 0.035, 1)
+ambient_light_energy = 0.25
+fog_enabled = true
+fog_light_color = Color(0.08, 0.09, 0.14, 1)
+fog_density = 0.045
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.04
+glow_enabled = true
+glow_intensity = 0.18
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="TestRoom" parent="." instance=ExtResource("2_room")]
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 4)
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]

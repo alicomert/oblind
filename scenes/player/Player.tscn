@@ -1,0 +1,51 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/PlayerController.gd" id="1_player"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.35
+height = 1.65
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_probe"]
+radius = 4.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_probe"]
+albedo_color = Color(0.25, 0.36, 0.95, 0.08)
+transparency = 1
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_player")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.65, 0)
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+position = Vector3(0, 1.32, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+current = true
+fov = 76.0
+
+[node name="Flashlight" type="SpotLight3D" parent="CameraPivot/Camera3D"]
+light_color = Color(0.72, 0.78, 1, 1)
+light_energy = 3.2
+spot_range = 11.0
+spot_angle = 32.0
+spot_angle_attenuation = 1.8
+shadow_enabled = true
+
+[node name="InteractionProbe" type="Area3D" parent="."]
+position = Vector3(0, 1.1, 0)
+monitoring = true
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionProbe"]
+shape = SubResource("SphereShape3D_probe")
+
+[node name="DebugProbeMesh" type="MeshInstance3D" parent="InteractionProbe"]
+visible = false
+material_override = SubResource("StandardMaterial3D_probe")
+
+[connection signal="area_entered" from="InteractionProbe" to="." method="_on_interaction_probe_area_entered"]
+[connection signal="area_exited" from="InteractionProbe" to="." method="_on_interaction_probe_area_exited"]

@@ -1,0 +1,105 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/HUD.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.015, 0.017, 0.022, 0.62)
+border_color = Color(0.48, 0.54, 0.82, 0.28)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="StoryPanel" type="PanelContainer" parent="Root"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 22.0
+offset_right = 522.0
+offset_bottom = 146.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="Root/StoryPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="Root/StoryPanel/Margin"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Root/StoryPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.84, 0.88, 1, 1)
+theme_override_font_sizes/font_size = 19
+text = "OBLIND"
+
+[node name="BodyLabel" type="Label" parent="Root/StoryPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+text = "..."
+autowrap_mode = 3
+
+[node name="FocusLabel" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 524.0
+offset_top = 342.0
+offset_right = 756.0
+offset_bottom = 376.0
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.95, 0.97, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = ""
+
+[node name="StatusPanel" type="PanelContainer" parent="Root"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 644.0
+offset_right = 262.0
+offset_bottom = 698.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="StatusMargin" type="MarginContainer" parent="Root/StatusPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="HBox" type="HBoxContainer" parent="Root/StatusPanel/StatusMargin"]
+layout_mode = 2
+
+[node name="HeartbeatLabel" type="Label" parent="Root/StatusPanel/StatusMargin/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.68, 0.72, 1)
+text = "68 BPM"
+
+[node name="PulseBar" type="ProgressBar" parent="Root/StatusPanel/StatusMargin/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 8)
+layout_mode = 2
+min_value = 60.0
+max_value = 150.0
+value = 68.0
+show_percentage = false
